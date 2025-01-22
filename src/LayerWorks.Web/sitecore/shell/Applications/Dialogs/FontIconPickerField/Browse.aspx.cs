@@ -80,13 +80,13 @@ namespace LayerWorks.Web.sitecore.shell.Applications.Dialogs.FontIconPickerField
         private IEnumerable<string> ParseCssClassNames(Uri src, string pattern, string baseClass)
         {
             List<string> icons = new List<string>();
-
+        
             try
             {
                 string path = Server.MapPath(src.ToString());
                 string text = CleanUp(File.ReadAllText(path));
                 string[] rules = text.Split('}');
-
+        
                 foreach (string rule in rules)
                 {
                     string[] ruleParts = rule.Split('{');
@@ -94,15 +94,15 @@ namespace LayerWorks.Web.sitecore.shell.Applications.Dialogs.FontIconPickerField
                     {
                         continue;
                     }
-
+        
                     // Remove CSS comments
                     string className = Regex.Replace(ruleParts[0], @"\/\*.*\*\/", string.Empty);
-
+        
                     className = className
                         .Split(',')[0] // Take the first selector
                         .Split('[')[0] // Exclude attribute selector portion
                         .Split(':')[0]; // Exclude pseudo class portion
-
+        
                     // Ensure that we're dealing with a unique/valid icon class
                     if (string.IsNullOrEmpty(className) ||
                        icons.Contains(className) ||
@@ -110,7 +110,18 @@ namespace LayerWorks.Web.sitecore.shell.Applications.Dialogs.FontIconPickerField
                     {
                         continue;
                     }
-
+        
+                    // Check for the Font Awesome 6 custom properties
+                    string iconCss = ruleParts[1];
+                    string faContent = Regex.Match(iconCss, @"--fa\s*:\s*""\\([a-fA-F0-9]+)""").Groups[1].Value;
+                    string faContentFaFa = Regex.Match(iconCss, @"--fa--fa\s*:\s*""\\([a-fA-F0-9]+)""").Groups[1].Value;
+        
+                    if (string.IsNullOrEmpty(faContent) && string.IsNullOrEmpty(faContentFaFa))
+                    {
+                        continue; // Skip icons that don't have the correct content property
+                    }
+        
+                    // Apply any user-defined filtering via regex
                     if (string.IsNullOrEmpty(pattern) || Regex.IsMatch(className, pattern))
                     {
                         className = className.Replace(".", string.Empty);
@@ -118,15 +129,26 @@ namespace LayerWorks.Web.sitecore.shell.Applications.Dialogs.FontIconPickerField
                         {
                             className = string.Format("{0} {1}", baseClass, className);
                         }
-                        icons.Add(className);
+        
+                        var iconData = new Dictionary<string, string>
+                        {
+                            { "class", className },
+                            { "fa", faContent },
+                            { "fa--fa", faContentFaFa }
+                        };
+        
+                        icons.Add(iconData.ToString()); // You may need to adjust how you store/display this information
                     }
                 }
             }
-            catch (Exception) { }
-
+            catch (Exception)
+            {
+                // Handle exceptions, possibly log them
+            }
+        
             return icons.OrderBy(x => x);
         }
-
+        
         protected void rptFontIconSet_OnItemDataBound(object sender, RepeaterItemEventArgs e)
         {
             DataList dlFontIconSet = (DataList)e.Item.FindControl("dlFontIconSet");
