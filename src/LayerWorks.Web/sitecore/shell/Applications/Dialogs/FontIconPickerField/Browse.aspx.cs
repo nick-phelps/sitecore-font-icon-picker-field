@@ -111,6 +111,16 @@ namespace LayerWorks.Web.sitecore.shell.Applications.Dialogs.FontIconPickerField
                         continue;
                     }
 
+                    // Check for the Font Awesome 6 custom properties
+                    string iconCss = ruleParts[1];
+                    string faContent = Regex.Match(iconCss, @"--fa\s*:\s*""\\([a-fA-F0-9]+)""").Groups[1].Value;
+                    string faContentFaFa = Regex.Match(iconCss, @"--fa--fa\s*:\s*""\\([a-fA-F0-9]+)""").Groups[1].Value;
+
+                    if (string.IsNullOrEmpty(faContent) && string.IsNullOrEmpty(faContentFaFa))
+                    {
+                        continue; // Skip icons that don't have the correct content property
+                    }
+
                     if (string.IsNullOrEmpty(pattern) || Regex.IsMatch(className, pattern))
                     {
                         className = className.Replace(".", string.Empty);
@@ -119,6 +129,15 @@ namespace LayerWorks.Web.sitecore.shell.Applications.Dialogs.FontIconPickerField
                             className = string.Format("{0} {1}", baseClass, className);
                         }
                         icons.Add(className);
+
+                        var iconData = new Dictionary<string, string>
+                        {
+                            { "class", className },
+                            { "fa", faContent },
+                            { "fa--fa", faContentFaFa }
+                        };
+
+                        icons.Add(iconData.ToString());
                     }
                 }
             }
