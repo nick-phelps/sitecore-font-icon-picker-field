@@ -34,7 +34,7 @@ namespace LayerWorks.Web.sitecore.shell.Applications.Dialogs.FontIconPickerField
             catch (Exception)
             {
                 litMessage.Text = @"<p>The field's 'Source' parameter is either missing or is not valid JSON.</p>
-                                    <p>Example configurations can be found at <a href=""https://github.com/dthunziker/sitecore-font-icon-picker-field"" target=""_blank"">github.com/dthunziker/sitecore-font-icon-picker-field</a></p>";
+                                    <p>Example configurations can be found at <a href=""https://github.com/nick-phelps/sitecore-font-icon-picker-field"" target=""_blank"">github.com/dthunziker/sitecore-font-icon-picker-field</a></p>";
             }
         }
 
