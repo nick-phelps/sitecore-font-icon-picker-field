@@ -34,7 +34,7 @@ namespace LayerWorks.Web.sitecore.shell.Applications.Dialogs.FontIconPickerField
             catch (Exception)
             {
                 litMessage.Text = @"<p>The field's 'Source' parameter is either missing or is not valid JSON.</p>
-                                    <p>Example configurations can be found at <a href=""https://github.com/nick-phelps/sitecore-font-icon-picker-field"" target=""_blank"">github.com/dthunziker/sitecore-font-icon-picker-field</a></p>";
+                                    <p>Example configurations can be found at <a href=""https://github.com/nick-phelps/sitecore-font-icon-picker-field"" target=""_blank"">github.com/nick-phelps/sitecore-font-icon-picker-field</a></p>";
             }
         }
 
@@ -90,6 +90,7 @@ namespace LayerWorks.Web.sitecore.shell.Applications.Dialogs.FontIconPickerField
                 foreach (string rule in rules)
                 {
                     string[] ruleParts = rule.Split('{');
+
                     if (ruleParts.Length != 2)
                     {
                         continue;
@@ -106,38 +107,20 @@ namespace LayerWorks.Web.sitecore.shell.Applications.Dialogs.FontIconPickerField
                     // Ensure that we're dealing with a unique/valid icon class
                     if (string.IsNullOrEmpty(className) ||
                        icons.Contains(className) ||
-                        !ruleParts[1].Contains("content"))
+                        !ruleParts[1].Contains("--fa--fa"))
                     {
                         continue;
-                    }
-
-                    // Check for the Font Awesome 6 custom properties
-                    string iconCss = ruleParts[1];
-                    string faContent = Regex.Match(iconCss, @"--fa\s*:\s*""\\([a-fA-F0-9]+)""").Groups[1].Value;
-                    string faContentFaFa = Regex.Match(iconCss, @"--fa--fa\s*:\s*""\\([a-fA-F0-9]+)""").Groups[1].Value;
-
-                    if (string.IsNullOrEmpty(faContent) && string.IsNullOrEmpty(faContentFaFa))
-                    {
-                        continue; // Skip icons that don't have the correct content property
                     }
 
                     if (string.IsNullOrEmpty(pattern) || Regex.IsMatch(className, pattern))
                     {
                         className = className.Replace(".", string.Empty);
+
                         if (!string.IsNullOrEmpty(baseClass))
                         {
                             className = string.Format("{0} {1}", baseClass, className);
                         }
                         icons.Add(className);
-
-                        var iconData = new Dictionary<string, string>
-                        {
-                            { "class", className },
-                            { "fa", faContent },
-                            { "fa--fa", faContentFaFa }
-                        };
-
-                        icons.Add(iconData.ToString());
                     }
                 }
             }
