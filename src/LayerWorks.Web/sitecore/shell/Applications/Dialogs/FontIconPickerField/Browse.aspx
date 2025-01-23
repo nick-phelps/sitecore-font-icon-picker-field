@@ -141,7 +141,7 @@
                 <span class="preview med"><i></i></span>
                 <span class="preview sm"><i></i></span>
                 <span class="name"></span>
-                <input type="text" placeholder="<%= Translate.Text("Type here to search") %>" />
+                <input type="text" placeholder="<%= Translate.Text("Type here to search for icons") %>" />
             </div>
         </div>
         <div class="results">
